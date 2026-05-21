@@ -81,11 +81,33 @@
                 </executions>
             </plugin>
             <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <!--
+                                java.net.http is not a default root module, and the test code
+                                lives inside the org.glassfish.grizzly.http.server module via
+                                patch-module, so we have to enable that module read explicitly.
+                            -->
+                            <compilerArgs combine.children="append">
+                                <arg>--add-modules</arg>
+                                <arg>java.net.http</arg>
+                                <arg>--add-reads</arg>
+                                <arg>org.glassfish.grizzly.http.server=java.net.http</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>
                         --add-opens java.base/java.lang=ALL-UNNAMED
                         --add-reads org.glassfish.grizzly.http=ALL-UNNAMED
+                        --add-reads org.glassfish.grizzly.http.server=java.net.http
                     </argLine>
                 </configuration>
             </plugin>
